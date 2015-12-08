@@ -1,0 +1,69 @@
+<!-- Validation failure messages -->
+<% if @wishlist.errors.any? %>
+  <% @wishlist.errors.full_messages.each do |message| %>
+    <div class="alert alert-dismissable alert-danger">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <%= message %>
+    </div>
+  <% end %>
+<% end %>
+<% if current_user.id == @wishlist.user_id then %>
+  <div class="container">
+    <div class="row">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Edit Wishlist
+    </h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+          <div class="col-md-offset-1 col-md-5">
+            <img src="<%= @wishlist.book.artwork %>"> <%= @wishlist.book.title %>
+          </div>
+          <div class="col-md-5">
+            <dl class="dl-horizontal">
+              <dt>Authors</dt>
+              <% @wishlist.book.authors.each do |author| %>
+                <dd><%= author.author_name %></dd>
+              <% end %>
+              <dt>Subject</dt>
+              <dd><%= @wishlist.book.subject.subject_number %> - <%= @wishlist.book.subject.subject_name %></dd>
+              <dt>Publisher</dt>
+              <dd><%= @wishlist.book.publisher %></dd>
+              <dt>Year</dt>
+              <dd><%= @wishlist.book.year %></dd>
+              <dt>Type of Wishlist</dt>
+              <dd><%= @wishlist.sale_rent %></dd>
+              <dt>Current Asking Price</dt>
+              <dd><%= number_to_currency(@wishlist.price) %></dd>
+            </dl>
+          </div>
+        </div>
+        <br>
+          <form action="/update_wishlist/<%= @wishlist.id %>" method="post" class="form-inline">
+            <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+            <input name="status_id" type="hidden" value="<%= @wishlist.status_id %>">
+            <!-- Label and input for price -->
+            <div class="form-group">
+              <label for="price" class="control-label">
+                Proposed price:
+        </label>
+              <input type="text" id="price" name="price" placeholder="Price" class="form-control-sm" value="<%= number_to_currency(@wishlist.price) %>">
+            </div>
+            <input name="sale_rent" type="hidden" value="<%= @wishlist.sale_rent %>">
+            <input name="user_id" type="hidden" value="<%= @wishlist.user_id %>">
+            <input name="book_id" type="hidden" value="<%= @wishlist.book_id %>">
+            <button class="btn btn-primary btn-xs">
+              Update
+      </button>
+            or
+      <a href="/mylistings">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+<% else %>
+  NOT AUTHORIZED
+<% end %>

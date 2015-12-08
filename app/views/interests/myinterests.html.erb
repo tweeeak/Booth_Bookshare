@@ -1,0 +1,403 @@
+<% cnt = 0 %>
+<div class="container">
+  <%= render("/shared/new_post.html.erb",
+  :mouseover   => "Find something to bid on",
+  :destination => "/books",
+  :content     => ["fa fa-plus", "fa fa-shopping-cart"]
+  )%>
+  <% if @accepted_interests.present? then%>
+    <div class="row">
+      <div class="panel panel-success">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Awaiting Delivery
+        </h3>
+        </div>
+        <div class="panel-body">
+          <!-- Awaiting Delivery are those bids on status 4 (Accepted) with listing 2 (Active)-->
+          <% @accepted_interests.each do |interest| %>
+            <table class="table table-condensed " style="border-collapse:collapse;">
+              <thead>
+                <tr>
+                  <th>&nbsp;</th>
+                  <th>Artwork</th>
+                  <th>Book</th>
+                  <th>Subject</th>
+                  <th>Year</th>
+                  <th>Agreed Price</th>
+                  <th>Seller</th>
+                  <th>Actions</th>
+                  <!--# of bids, max min? price diff or best? idk...-->
+                </tr>
+              </thead>
+              <tbody>
+                <!-- No need for collapsing and complex tables here. Only 1 per book -->
+                <tr>
+                  <td>&nbsp;</td>
+                  <td><img src="<%= interest.book.artwork %>" height=30%></td>
+                  <td><%= interest.listing.book.title %></td>
+                  <td><%= interest.listing.book.subject.subject_number %> - <%= interest.listing.book.subject.subject_name %></td>
+                  <td><%= interest.book.year %></td>
+                  <td><%= number_to_currency(interest.prop_price) %></td>
+                  <td><%= interest.listing.user.username.capitalize %></td>
+                  <td>
+                    <%= render("/interests/partial/await_deliver_actions.html.erb", :interest => interest) %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+  <% if @submitted_interests.present? then%>
+    <div class="row">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Submitted Bids
+        </h3>
+        </div>
+        <div class="panel-body">
+          <!-- Where to start from. interests, easy to get, but not enough.-->
+          <!-- Book makes it easier to show in order. Bigger loops?        -->
+          <table class="table table-condensed " style="border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th>&nbsp;</th>
+                <th>Artwork</th>
+                <th>Book</th>
+                <th>Subject</th>
+                <th>Year</th>
+                <!--# of bids, max min? price diff or best? idk...-->
+              </tr>
+            </thead>
+            <tbody>
+              <% firstloop = 1 %>
+              <% old_book = -1 %>
+              <% @submitted_interests.each do |interest|%>
+                <% if interest.listing.status_id == "1" then %>
+                  <!-- Only go through here if it is a new book-->
+                  <% new_book = interest.listing.book_id %>
+                  <% if firstloop == 1 || new_book != old_book then %>
+                    <% if firstloop != 1 && new_book != old_book then %>
+                    </table>
+                  <% end %>
+                  <% old_book = new_book %>
+                  <% firstloop += 1 %>
+                  <tr data-toggle="collapse" data-target="#demo<%= cnt %>" class="accordion-toggle">
+                    <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+                    <td><img src="<%= interest.listing.book.artwork%>" height=30%></td>
+                    <td><%= interest.listing.book.title %></td>
+                    <td><%= interest.listing.book.subject.subject_number %> - <%= interest.listing.book.subject.subject_name %></td>
+                    <td><%= interest.listing.book.year %></td>
+                  </tr>
+                  <tr>
+                    <td colspan="12" class="hiddenRow">
+                      <div class="accordian-body collapse" id="demo<%= cnt %>">
+                        <div class="row">
+                          <div class="col-md-offset-2 col-md-9">
+                            <table class="table table-striped table-condensed table-hover">
+                              <tr>
+                                <th>Type</th>
+                                <th>Price</th>
+                                <th>Proposed Price</th>
+                                <th>Price +/-</th>
+                                <th>Seller</th>
+                                <th>Submitted</th>
+                                <th>Actions</th>
+                              </tr>
+                              <!-- should loop here maybe -->
+                            <% end %>
+                            <tr>
+                              <td><%= interest.listing.sale_rent %></td>
+                              <td><%= number_to_currency(interest.listing.price) %></td>
+                              <td><%= number_to_currency(interest.prop_price) %></td>
+                              <td><font color=" <%= if interest.prop_price - interest.listing.price <= 0 then 'green' else 'red' end %>">
+                                  <%= number_to_currency(interest.prop_price - interest.listing.price) %></font>
+                              </td>
+                              <td><%= interest.listing.user.username.capitalize %></td>
+                              <td><%= time_ago_in_words(interest.updated_at)%> ago</td>
+                              <td>
+                                <%= render("/interests/partial/action_edit_del_interests.html.erb", :interest=> interest) %>
+                              </td>
+                            </tr>
+                            <% cnt +=1 %>
+                          <% end %>
+                        <% end %>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% end %>
+<% if @declined_interests.present? then%>
+  <div class="row">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Declined Bids
+      </h3>
+      </div>
+      <div class="panel-body">
+        <!-- Where to start from. interests, easy to get, but not enough.-->
+        <!-- Book makes it easier to show in order. Bigger loops?        -->
+        <table class="table table-condensed " style="border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>Artwork</th>
+              <th>Book</th>
+              <th>Subject</th>
+              <th>Year</th>
+              <!--# of bids, max min? price diff or best? idk...-->
+            </tr>
+          </thead>
+          <tbody>
+            <% firstloop = 1 %>
+            <% old_book = -1 %>
+            <% @declined_interests.each do |interest|%>
+              <% if interest.listing.status_id == "1" then %>
+                <!-- Only go through here if it is a new book-->
+                <% new_book = interest.listing.book_id %>
+                <% if firstloop == 1 || new_book != old_book then %>
+                  <% if firstloop != 1 && new_book != old_book then %>
+                  </table>
+                <% end %>
+                <% old_book = new_book %>
+                <% firstloop += 1 %>
+                <tr data-toggle="collapse" data-target="#demo<%= cnt %>" class="accordion-toggle">
+                  <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+                  <td><img src="<%= interest.listing.book.artwork%>" height=30%></td>
+                  <td><%= interest.listing.book.title %></td>
+                  <td><%= interest.listing.book.subject.subject_number %> - <%= interest.listing.book.subject.subject_name %></td>
+                  <td><%= interest.listing.book.year %></td>
+                </tr>
+                <tr>
+                  <td colspan="12" class="hiddenRow">
+                    <div class="accordian-body collapse" id="demo<%= cnt %>">
+                      <div class="row">
+                        <div class="col-md-offset-2 col-md-9">
+                          <table class="table table-striped table-condensed table-hover">
+                            <tr>
+                              <th>Type</th>
+                              <th>Price</th>
+                              <th>Proposed Price</th>
+                              <th>Price +/-</th>
+                              <th>Seller</th>
+                              <th>Submitted</th>
+                              <th>Actions</th>
+                            </tr>
+                            <!-- should loop here maybe -->
+                          <% end %>
+                          <tr>
+                            <td><%= interest.listing.sale_rent %></td>
+                            <td><%= number_to_currency(interest.listing.price) %></td>
+                            <td><%= number_to_currency(interest.prop_price) %></td>
+                            <td><font color=" <%= if interest.prop_price - interest.listing.price <= 0 then 'green' else 'red' end %>">
+                                <%= number_to_currency(interest.prop_price - interest.listing.price) %></font>
+                            </td>
+                            <td><%= interest.listing.user.username.capitalize %></td>
+                            <td><%= time_ago_in_words(interest.updated_at)%> ago</td>
+                            <td>
+                              <% if can_rebid?(interest.listing) %>
+                                <span title="Re-bid"><a href="/interests/<%= interest.id %>/edit" class="btn btn-warning btn-xs"><i class="fa fa-cart-plus"></i>
+                                  </a></span>
+                              <% end %>
+                            </td>
+                          </tr>
+                          <% cnt +=1 %>
+                        <% end %>
+                      <% end %>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% end %>
+<% if @expired_interests.present? then%>
+  <div class="row">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Expired Bids
+    </h3>
+      </div>
+      <div class="panel-body">
+        <!-- Where to start from. interests, easy to get, but not enough.-->
+        <!-- Book makes it easier to show in order. Bigger loops?        -->
+        <table class="table table-condensed " style="border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>Artwork</th>
+              <th>Book</th>
+              <th>Subject</th>
+              <th>Year</th>
+              <!--# of bids, max min? price diff or best? idk...-->
+            </tr>
+          </thead>
+          <tbody>
+            <% firstloop = 1 %>
+            <% old_book = -1 %>
+            <% @expired_interests.each do |interest|%>
+              <%# if interest.listing.status_id == "1" then %>
+              <!-- Only go through here if it is a new book-->
+              <% new_book = interest.listing.book_id %>
+              <% if firstloop == 1 || new_book != old_book then %>
+                <% if firstloop != 1 && new_book != old_book then %>
+                </table>
+              <% end %>
+              <% old_book = new_book %>
+              <% firstloop += 1 %>
+              <tr data-toggle="collapse" data-target="#demo<%= cnt %>" class="accordion-toggle">
+                <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+                <td><img src="<%= interest.listing.book.artwork%>" height=30%></td>
+                <td><%= interest.listing.book.title %></td>
+                <td><%= interest.listing.book.subject.subject_number %> - <%= interest.listing.book.subject.subject_name %></td>
+                <td><%= interest.listing.book.year %></td>
+              </tr>
+              <tr>
+                <td colspan="12" class="hiddenRow">
+                  <div class="accordian-body collapse" id="demo<%= cnt %>">
+                    <div class="row">
+                      <div class="col-md-offset-2 col-md-9">
+                        <table class="table table-striped table-condensed table-hover">
+                          <tr>
+                            <th>Type</th>
+                            <th>Price</th>
+                            <th>Proposed Price</th>
+                            <th>Price +/-</th>
+                            <th>Seller</th>
+                            <th>Submitted</th>
+                            <th>Actions</th>
+                          </tr>
+                          <!-- should loop here maybe -->
+                        <% end %>
+                        <tr>
+                          <td><%= interest.listing.sale_rent %></td>
+                          <td><%= number_to_currency(interest.listing.price) %></td>
+                          <td><%= number_to_currency(interest.prop_price) %></td>
+                          <td><font color=" <%= if interest.prop_price - interest.listing.price <= 0 then 'green' else 'red' end %>">
+                              <%= number_to_currency(interest.prop_price - interest.listing.price) %></font>
+                          </td>
+                          <td><%= interest.listing.user.username.capitalize %></td>
+                          <td><%= time_ago_in_words(interest.updated_at)%> ago</td>
+                          <td>
+                            <%= render("/interests/partial/dismiss_interest_button.html.erb", :interest => interest) %>
+                          </td>
+                        </tr>
+                        <% cnt +=1 %>
+                        <%# end %>
+                      <% end %>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% end %>
+<% if @rented_interests.present? then%>
+  <div class="row">
+    <div class="panel panel-danger">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Borrowing Right Now
+  </h3>
+      </div>
+      <div class="panel-body">
+        <!-- Where to start from. interests, easy to get, but not enough.-->
+        <!-- Book makes it easier to show in order. Bigger loops?        -->
+        <table class="table table-condensed " style="border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>&nbsp;</th>
+              <th>Artwork</th>
+              <th>Book</th>
+              <th>Subject</th>
+              <th>Year</th>
+              <!--# of bids, max min? price diff or best? idk...-->
+            </tr>
+          </thead>
+          <tbody>
+            <% firstloop = 1 %>
+            <% old_book = -1 %>
+            <% @rented_interests.each do |interest|%>
+              <% if interest.listing.status_id == "1" then %>
+                <!-- Only go through here if it is a new book-->
+                <% new_book = interest.listing.book_id %>
+                <% if firstloop == 1 || new_book != old_book then %>
+                  <% if firstloop != 1 && new_book != old_book then %>
+                  </table>
+                <% end %>
+                <% old_book = new_book %>
+                <% firstloop += 1 %>
+                <tr data-toggle="collapse" data-target="#demo<%= cnt %>" class="accordion-toggle">
+                  <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+                  <td><img src="<%= interest.listing.book.artwork%>" height=30%></td>
+                  <td><%= interest.listing.book.title %></td>
+                  <td><%= interest.listing.book.subject.subject_number %> - <%= interest.listing.book.subject.subject_name %></td>
+                  <td><%= interest.listing.book.year %></td>
+                </tr>
+                <tr>
+                  <td colspan="12" class="hiddenRow">
+                    <div class="accordian-body collapse" id="demo<%= cnt %>">
+                      <div class="row">
+                        <div class="col-md-offset-2 col-md-9">
+                          <table class="table table-striped table-condensed table-hover">
+                            <tr>
+                              <th>Type</th>
+                              <th>Price</th>
+                              <th>Proposed Price</th>
+                              <th>Price +/-</th>
+                              <th>Seller</th>
+                              <th>Received</th>
+                              <th>Actions</th>
+                            </tr>
+                            <!-- should loop here maybe -->
+                          <% end %>
+                          <tr>
+                            <td><%= interest.listing.sale_rent %></td>
+                            <td><%= number_to_currency(interest.listing.price) %></td>
+                            <td><%= number_to_currency(interest.prop_price) %></td>
+                            <td><font color=" <%= if interest.prop_price - interest.listing.price <= 0 then 'green' else 'red' end %>">
+                                <%= number_to_currency(interest.prop_price - interest.listing.price) %></font>
+                            </td>
+                            <td><%= interest.listing.user.username.capitalize %></td>
+                            <td><%= time_ago_in_words(interest.updated_at)%> ago</td>
+                            <td><span title="Contact"><a href="/interests/contact/<%= interest.id %>" class="btn btn-primary btn-xs"><i class="fa fa-envelope-o"></i></a></span></td>
+                          </tr>
+                          <% cnt +=1 %>
+                        <% end %>
+                      <% end %>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% end %>
+</div>

@@ -1,0 +1,9 @@
+
+<% if interest.user_id == current_user.id && interest.status_id.to_i < 4 then %>
+
+<span title= "Edit Bid"><a href="/interests/<%= interest.id %>/edit" class="btn btn-xs btn-warning"><i class="fa fa-pencil-square-o"></i></a></span>
+
+<span title= "Delete Bid"><a href="/delete_interest/<%= interest.id %>" class="btn btn-xs btn-danger" rel="nofollow"><i class="fa fa-trash"></i></a></span>
+
+<% end %>
+

@@ -1,0 +1,37 @@
+<div class="page-header">
+  <h3>Wishlist #<%= @wishlist.id %></h3>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <dl class="dl-horizontal">
+      <dt>Status</dt>
+      <dd><%= @wishlist.status_id %></dd>
+
+      <dt>Price</dt>
+      <dd><%= number_to_currency(@wishlist.price) %></dd>
+
+      <dt>Sale rent</dt>
+      <dd><%= @wishlist.sale_rent %></dd>
+
+      <dt>User</dt>
+      <dd><%= @wishlist.user_id %></dd>
+
+      <dt>Book</dt>
+      <dd><%= @wishlist.book_id %></dd>
+
+    </dl>
+
+    <div class="btn-group btn-group-justified">
+      <a href="/wishlists" class="btn btn-primary">
+        Back
+      </a>
+      <a href="/wishlists/<%= @wishlist.id %>/edit" class="btn btn-warning">
+        Edit
+      </a>
+      <a href="/delete_wishlist/<%= @wishlist.id %>" class="btn btn-danger" rel="nofollow">
+        Delete
+      </a>
+    </div>
+  </div>
+</div>

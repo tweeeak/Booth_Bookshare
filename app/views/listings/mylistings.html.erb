@@ -1,0 +1,431 @@
+<style>
+  form {display: inline-block;}
+</style>
+<div class="container">
+
+  <%= render("/shared/new_post.html.erb",
+  :mouseover   => "Create new Listing",
+  :destination => "/listings/new",
+  :content     => ["fa fa-plus", "fa fa-th-list"]
+  )%>
+
+<% cnt = 0 %>
+
+<% display_count = 0 %>
+<% @listings.order("book_id ASC, sale_rent ASC").each do |list| %>
+<% if list.interests.present? && list.interests.find_by(:status => 3).present? then %>
+<% display_count += 1 %>
+<% end %>
+<% end %>
+<% if display_count > 0 then %>
+
+<div class = "row">
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <span title="Listings that have interests on it. Click the 'eye' button to select which interest to respond to.">
+        <h3 class="panel-title">
+          Buyer Found
+        </h3>
+      </span>
+    </div>
+    <div class="panel-body">
+      <!-- Show own listings with interests & use hidden button for all hits per listings -->
+      <table class="table table-condensed " style="border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>Artwork</th>
+            <th>Book</th>
+            <th>Subject</th>
+            <th>Year</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <% @listings.order("book_id ASC, sale_rent ASC").each do |list| %>
+          <% if list.interests.present? && list.interests.find_by(:status => 3).present? then %>
+          <!-- Put Listing -->
+          <tr data-toggle="collapse" data-target="#demo<%= cnt %>" class="accordion-toggle">
+            <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+            <td><img src="<%= list.book.artwork%>" height=30%></td>
+            <td><%= list.book.title %></td>
+            <td><%= list.book.subject.subject_number %> - <%= list.book.subject.subject_name %></td>
+            <td><%= list.book.year %></td>
+            <td><%= list.sale_rent %></td>
+            <td><%= number_to_currency(list.price) %></td>
+            <td>
+              <% if can_edit?(list) then %>
+
+              <a href="/listings/<%= list.id %>/edit" class="btn btn-xs btn-warning"><i class="fa fa-pencil-square-o"></i>
+              </a>
+              <a href="/delete_listing/<%= list.id %>" class="btn btn-xs btn-danger" rel="nofollow"><i class="fa fa-trash"></i>
+              </a>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="12" class="hiddenRow">
+              <div class="accordian-body collapse" id="demo<%= cnt %>">
+                <div class="row">
+                  <div class="col-md-offset-2 col-md-9">
+                    <table class="table table-striped table-condensed table-hover">
+                      <tr>
+                        <th>Interested</th>
+                        <th>Proposed Price</th>
+                        <th>Price +/-</th>
+                        <th>Actions</th>
+                      </tr>
+                      <% list.interests.order("status_id ASC, prop_price DESC").each do |interest| %>
+                      <tr>
+                        <td><%= interest.user.username.capitalize %></td>
+                        <td><%= number_to_currency(interest.prop_price) %></td>
+                        <td><font color=" <%= if interest.prop_price - list.price < 0 then 'red' else 'green' end %>">
+                          <%= number_to_currency(interest.prop_price - list.price) %></font>
+                        </td>
+                        <td>
+                          <% if interest.listing.user.id == current_user.id && interest.status.status == "submitted" then %>
+                          <span display="inline-block">
+                            <span title="Accept Bid">
+                              <form action="/update_interest/<%= interest.id %>" method="post" class ="form-inline">
+                                <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+                                <input name="status_id" type="hidden"    value="4">
+                                <input name="prop_price" type="hidden"    value="<%= interest.prop_price %>">
+                                <input name="user_id" type="hidden"       value="<%= interest.user_id %>">
+                                <input name="listing_id" type="hidden"    value="<%= interest.listing_id %>">
+                                <button class="btn btn-xs btn-success">
+                                  <i class="fa fa-check"></i>
+                                </button>
+                              </form>
+                            </span>
+                            <span title="Reject Bid">
+                              <form action="/update_interest/<%= interest.id %>" method="post" class ="form-inline">
+                                <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+                                <input name="status_id" type="hidden"    value="5">
+                                <input name="prop_price" type="hidden"    value="<%= interest.prop_price %>">
+                                <input name="user_id" type="hidden"       value="<%= interest.user_id %>">
+                                <input name="listing_id" type="hidden"    value="<%= interest.listing_id %>">
+                                <button class="btn btn-xs btn-danger">
+                                  <i class="fa fa-times"></i>
+                                </button>
+                              </form>
+                            </span>
+                          </span>
+                          <% end %>
+                        </td>
+                      </tr>
+                      <% end %>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <% cnt +=1 %>
+          <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<% display_count = 0 %>
+<% @listings.order("book_id ASC, sale_rent ASC").each do |list| %>
+<% if not(list.interests.present?) || (list.interests.present? && not(list.interests.find_by(:status => [3,4,6,7,8,9]).present?)) then %>
+<% display_count +=1 %>
+<% end %>
+<% end %>
+<% if display_count > 0 then %>
+
+<div class = "row">
+  <div class="panel panel-warning">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        No Bids Yet
+      </h3>
+    </div>
+    <div class="panel-body">
+      <!-- Show own listings with no interests & use hidden button for similar listings -->
+      <table class="table table-condensed " style="border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>Artwork</th>
+            <th>Book</th>
+            <th>Subject</th>
+            <th>Year</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Remember: do NOT reinitialize cnt-->
+          <% @listings.order("book_id ASC, sale_rent ASC").each do |list| %>
+          <% if not(list.interests.present?) || (list.interests.present? && not(list.interests.find_by(:status => [3,4,6,7,8,9]).present?)) then %>
+          <tr data-toggle="collapse" data-target="#demo<%= cnt %>" class="accordion-toggle">
+            <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+            <td><img src="<%= list.book.artwork%>" height=30%></td>
+            <td><%= list.book.title %></td>
+            <td><%= list.book.subject.subject_number %> - <%= list.book.subject.subject_name %></td>
+            <td><%= list.book.year %></td>
+            <td><%= list.sale_rent %></td>
+            <td><%= number_to_currency(list.price) %></td>
+            <td>
+              <% if list.user_id == current_user.id then %>
+              <a href="/listings/<%= list.id %>/edit" class="btn btn-xs btn-warning"><i class="fa fa-pencil-square-o"></i>
+              </a>
+              <a href="/delete_listing/<%= list.id %>" class="btn btn-xs btn-danger" rel="nofollow"><i class="fa fa-trash"></i>
+              </a>
+              <% end %>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="12" class="hiddenRow">
+              <div class="accordian-body collapse" id="demo<%= cnt %>">
+                <div class="row">
+                  <div class="col-md-offset-1 col-md-5">
+                    <p align = "center"><b>Similar Offers</b></p>
+                    <table class="table table-striped table-condensed table-hover">
+                      <tr>
+                        <th>Seller</th>
+                        <th>Type</th>
+                        <th>Competitor Price</th>
+                        <th>Price +/-</th>
+                        <th>Action
+                        </th>
+                      </tr>
+                      <!-- Let's find all active listings for same book -->
+                      <% if list.sale_rent == "Sale" %>
+                      <% comp_listings = Listing.where.not({:user_id => current_user.id}).where({:status_id => 1, :book_id => list.book.id}).order("sale_rent DESC, price ASC") %>
+                      <% else %>
+                      <% comp_listings = Listing.where.not({:user_id => current_user.id}).where({:status_id => 1, :book_id => list.book.id}).order("sale_rent ASC, price ASC") %>
+                      <% end %>
+                      <% comp_listings.each do |clist| %>
+                      <tr>
+                        <td><%= clist.user.username.capitalize %></td>
+                        <td><font color=" <%= if clist.sale_rent != list.sale_rent then 'red' end %>"><%= clist.sale_rent %></font></td>
+                        <td><%= number_to_currency(clist.price) %></td>
+                        <td><font color=" <%= if clist.price - list.price < 0 then 'red' else 'green' end %>">
+                          <%= number_to_currency(clist.price - list.price) %></font>
+                        </td>
+                        <td>
+                          <% if list.sale_rent == clist.sale_rent && clist.price < list.price then %>
+                          <span title="Undercut">
+                            <form action="/update_listing/<%= list.id %>" method="post">
+                              <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token                   %>">
+                              <input name="status_id" type="hidden" value="1">
+                              <input name="price"     type="hidden" value="<%= [clist.price - 1,0].max %>">
+                              <input name="sale_rent" type="hidden" value="<%= list.sale_rent %>">
+                              <input name="user_id" type="hidden" value="<%= current_user.id %>">
+                              <input name="book_id" type="hidden" value="<%= list.book_id%>">
+                              <button class="btn btn-warning btn-xs">
+                                <i class="fa fa-scissors"></i>
+                              </button>
+                            </form>
+                          </span>
+                          <% end %>
+                        </td>
+                      </tr>
+                      <% end %>
+                    </table>
+                  </div>
+                  <div class="col-md-5">
+                    <p align = "center"><b>Wishlists</b></p>
+                    <table class="table table-striped table-condensed table-hover">
+                      <tr>
+                        <th>Buyer</th>
+                        <th>Type</th>
+                        <th>Target Price</th>
+                        <th>Price +/-</th>
+                        <th>Action</th>
+                      </tr>
+                      <!-- Let's find all wishlists for same book -->
+                      <% if list.sale_rent == "Sale" then %>
+                      <% wl = list.book.wishlists.where.not({:user_id => current_user.id}).where({:status_id => 1}).order("sale_rent DESC, price ASC") %>
+                      <% else %>
+                      <% wl = list.book.wishlists.where.not({:user_id => current_user.id}).where({:status_id => 1}).order("sale_rent ASC, price ASC")%>
+                      <% end %>
+                      <% wl.each do |wlist| %>
+                      <tr>
+                        <td><%= wlist.user.username.capitalize %></td>
+                        <td><font color=" <%= if wlist.sale_rent != list.sale_rent then 'red' end %>"><%= wlist.sale_rent %></font></td>
+                        <td><%= number_to_currency(wlist.price) %></td>
+                        <td><font color=" <%= if wlist.price - list.price < 0 then 'red' else 'green' end %>">
+                          <%= number_to_currency(wlist.price - list.price) %></font>
+                        </td>
+                        <td>
+                          <% if list.sale_rent == wlist.sale_rent then %>
+                          <span title="Conform and accept"><a href="/interests/makeawishcometrue/<%= list.id %>/<%= wlist.id %>" class="btn-xs btn-warning"><i class="fa fa-gift"></i>
+                          </a></span>
+                          <% end %>
+                        </td>
+                      </tr>
+                      <% end %>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+            </td>
+          </tr>
+          <% cnt += 1 %>
+          <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<% display_count = 0 %>
+<% @listings.order("book_id ASC, sale_rent ASC").each do |list| %>
+<% if list.interests.present? && list.interests.find_by(:status => 4).present? then %>
+<% display_count += 1 %>
+<% end %>
+<% end %>
+
+<% if display_count > 0 then %>
+<div class = "row">
+  <div class="panel panel-danger">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        URGENT - Books to Deliver
+      </h3>
+    </div>
+    <div class="panel-body">
+      <!-- Delivered, Gave up or contact. -->
+      <table class="table table-condensed " style="border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>Artwork</th>
+            <th>Book</th>
+            <th>Subject</th>
+            <th>Year</th>
+            <th>Type</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @listings.order("book_id ASC, sale_rent ASC").each do |list| %>
+          <% if list.interests.present? && list.interests.find_by(:status => 4).present? then %>
+          <!-- Put Listing -->
+          <tr data-toggle="collapse" data-target="#demo<%= cnt %>" class="accordion-toggle">
+            <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+            <td><img src="<%= list.book.artwork%>" height=30%></td>
+            <td><%= list.book.title %></td>
+            <td><%= list.book.subject.subject_number %> - <%= list.book.subject.subject_name %></td>
+            <td><%= list.book.year %></td>
+            <td><%= list.sale_rent %></td>
+            <td><%= number_to_currency(list.price) %></td>
+          </tr>
+          <tr>
+            <td colspan="12" class="hiddenRow">
+              <div class="accordian-body collapse" id="demo<%= cnt %>">
+                <div class="row">
+                  <div class="col-md-offset-2 col-md-9">
+                    <table class="table table-striped table-condensed table-hover">
+                      <tr>
+                        <th>Interested</th>
+                        <th>Proposed Price</th>
+                        <th>Price +/-</th>
+                        <th>Actions</th>
+                      </tr>
+                      <% list.interests.order("status_id ASC, prop_price DESC").each do |interest| %>
+                      <tr>
+                        <td><%= interest.user.username.capitalize %></td>
+                        <td><%= number_to_currency(interest.prop_price) %></td>
+                        <td><font color=" <%= if interest.prop_price - list.price < 0 then 'red' else 'green' end %>">
+                          <%= number_to_currency(interest.prop_price - list.price) %></font>
+                        </td>
+                        <td>
+                          <% if interest.listing.user.id == current_user.id && interest.status.status == "accepted" then %>
+                          <span title="Contact"><a href="/interests/contact/<%= interest.id %>" class="btn-xs btn-primary"><i class="fa fa-envelope-o"></i>
+                          </a></span>
+                          <span title="Give Up"><a href="/interests/giveup/<%= interest.id %>" class="btn-xs btn-danger"><i class="fa fa-frown-o"></i>
+                          </a></span>
+                          <% end %>
+                        </td>
+                      </tr>
+                      <% end %>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </td>
+          </tr>
+          <% cnt +=1 %>
+          <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+<% end %>
+
+<!-- Only show if there is stuff to show -->
+<% display_count = 0 %>
+<% @listings.each do |listing| %>
+<% if listing.interests.present? && listing.interests.find_by({:status_id => 6.to_s}) then %>
+<% display_count +=1 %>
+<% end %>
+<% end %>
+<% if display_count > 0 then %>
+<div class="row">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">
+        Rented Books
+      </h3>
+    </div>
+    <div class="panel-body">
+      <table class="table table-condensed " style="border-collapse:collapse;">
+        <thead>
+          <tr>
+            <th>&nbsp;</th>
+            <th>Artwork</th>
+            <th>Book</th>
+            <th>Subject</th>
+            <th>Year</th>
+            <th>Agreed Price</th>
+            <th>Rented to</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @listings.order("updated_at DESC").each do |listing| %>
+          <% if listing.interests.present? && listing.interests.find_by({:status_id => 6.to_s}) then %>
+          <tr>
+            <td>&nbsp;</td>
+            <td><img src="<%= listing.book.artwork%>" height=30%></td>
+            <td><%= listing.book.title %></td>
+            <td><%= listing.book.subject.subject_number %> - <%= listing.book.subject.subject_name %></td>
+            <td><%= listing.book.year %></td>
+            <td><%= number_to_currency(listing.interests.find_by({:status_id => 6.to_s}).prop_price) %></td>
+            <td><%= listing.interests.find_by({:status_id => 6.to_s}).user.username.capitalize %></td>
+            <td>
+              <% if listing.user.id == current_user.id then %>
+              <span title="Returned"><a href="/interests/returned/<%= listing.interests.find_by({:status_id => 6.to_s}).id %>" class="btn-xs btn-success"><i class="fa fa-book"></i></a></span>
+              <span title="Contact"><a href="/interests/contact/<%= listing.interests.find_by({:status_id => 6.to_s}).id %>" class="btn-xs btn-primary"><i class="fa fa-envelope-o"></i></a></span>
+              <% end %>
+            </td>
+          </tr>
+          <% end %>
+          <% end %>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>
+<% end %>
+
+
+</div>

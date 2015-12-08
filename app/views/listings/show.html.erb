@@ -1,0 +1,139 @@
+<p></p>
+<div class="container">
+  <div class="row">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Book Details
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-offset-1 col-md-4">
+          <img src="<%= @listing.book.artwork %>"> <%= @listing.book.title %>
+        </div>
+        <div class="col-md-5">
+          <dl class="dl-horizontal">
+            <dt>Authors</dt>
+            <% @listing.book.authors.each do |author| %>
+            <dd><%= author.author_name %></dd>
+            <% end %>
+
+            <dt>Subject</dt>
+            <dd><%= @listing.book.subject.subject_number %> - <%= @listing.book.subject.subject_name %></dd>
+
+            <dt>Publisher</dt>
+            <dd><%= @listing.book.publisher %></dd>
+
+            <dt>Year</dt>
+            <dd><%= @listing.book.year %></dd>
+
+            <dt>Isbn13</dt>
+            <dd><%= @listing.book.isbn13 %></dd>
+
+            <dt>Isbn10</dt>
+            <dd><%= @listing.book.isbn10 %></dd>
+
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Listing Details
+        </h3>
+      </div>
+      <div class="panel-body">
+        <!-- Show own listings with interests & use hidden button for all hits per listings -->
+        <table class="table table-condensed " style="border-collapse:collapse;">
+          <thead>
+            <tr>
+              <th>Book</th>
+              <th>Subject</th>
+              <th>Year</th>
+              <th>Type</th>
+              <th>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% cnt = 0 %>
+            <!-- Put Listing -->
+            <tr>
+              <td><%= @listing.book.title %></td>
+              <td><%= @listing.book.subject.subject_number %> - <%= @listing.book.subject.subject_name %></td>
+              <td><%= @listing.book.year %></td>
+              <td><%= @listing.sale_rent %></td>
+              <td><%= number_to_currency(@listing.price) %></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </div>
+
+
+<% if @listing.user.id == current_user.id then %>
+    <div class="row">
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Interests
+          </h3>
+        </div>
+        <div class="panel-body">
+          <table class="table table-striped table-condensed table-hover">
+            <tr>
+              <th>Interested</th>
+              <th>Proposed Price</th>
+              <th>Price +/-</th>
+              <th>Actions</th>
+            </tr>
+
+            <% @listing.interests.order("status_id ASC, prop_price DESC").each do |interest| %>
+            <tr>
+              <td><%= interest.user.username.capitalize %></td>
+              <td><%= number_to_currency(interest.prop_price) %></td>
+              <td><font color=" <%= if interest.prop_price - @listing.price < 0 then 'red' else 'green' end %>">
+                <%= number_to_currency(interest.prop_price - @listing.price) %></font> </td>
+                <td>
+                  <% if interest.listing.user.id == current_user.id && interest.status.status == "submitted" then %>
+                  <span title="Accept Bid"><a href="/interests/<%= interest.id %>/accept" class="btn-xs btn-success"><i class="fa fa-check"></i></a></span>
+                  <span title="Reject Bid"><a href="/interests/<%= interest.id %>/reject" class="btn-xs btn-danger"><i class="fa fa-times"></i></a></span>
+                  <% end %>
+                </td>
+              </tr>
+              <% end %>
+            </table>
+
+
+          </div>
+        </div>
+      </div>
+<% end %>
+
+
+
+
+
+
+
+
+      <div class="btn-group btn-group-justified">
+        <a href="/mylistings" class="btn btn-primary">
+          Back
+        </a>
+        <% if @listing.user.id == current_user.id  && not(@listing.interests.find_by(:status_id => [4,5,6,7,8,9]).present?) then %>
+        <a href="/listings/<%= @listing.id %>/edit" class="btn btn-warning">
+          Edit
+        </a>
+        <a href="/delete_listing/<%= @listing.id %>" class="btn btn-danger" rel="nofollow">
+          Delete
+        </a>
+        <% end  %>
+      </div>
+
+
+</div>

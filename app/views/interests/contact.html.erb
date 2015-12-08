@@ -1,0 +1,37 @@
+<% if @interest.user.id == current_user.id || @listing.user.id == current_user.id then %>
+  <div class="container">
+    <div class="row">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            <% if @listing.user.id == current_user.id then %>
+              Buyer E-mail
+      <% else %>
+              Seller E-mail
+      <% end %>
+          </h3>
+        </div>
+        <div class="panel-body">
+          <% if @listing.user.id == current_user.id then %>
+            <p><b>Buyer:</b> <%= @interest.user.username.capitalize %></p>
+            <p><b>Email:</b> <%= @interest.user.email %></p>
+          <% else %>
+            <p><b>Seller:</b> <%= @listing.user.username.capitalize %></p>
+            <p><b>Email:</b> <%=    @listing.user.email %></p>
+          <% end %>
+          <div class="btn-group-xs btn-group-justified">
+            <% if @listing.user.id == current_user.id then %>
+            <a href="/mylistings" class="btn btn-primary">
+              Back
+            </a>
+            <% else %>
+            <a href="/myinterests" class="btn btn-primary">
+              Back
+            </a>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>

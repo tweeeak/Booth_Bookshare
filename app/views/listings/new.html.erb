@@ -1,0 +1,244 @@
+<!-- Validation failure messages -->
+<% if @listing.errors.any? %>
+  <% @listing.errors.full_messages.each do |message| %>
+    <div class="alert alert-dismissable alert-danger">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <%= message %>
+    </div>
+  <% end %>
+<% end %>
+<br>
+<div class="container">
+  <div class="row">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Selection Parameters
+       </h3>
+      </div>
+      <div class="panel-body">
+        <form action="/listings/new" class="form-inline">
+          <!-- Label and input for book_id -->
+          <div class="form-group">
+            <label for="book_id" class="control-label">
+              Book
+          </label>
+            <% if not(@listing.book_id.present?) && params[:book_id].present? then %>
+              <% @listing.book_id = params[:book_id] %>
+            <% end %>
+            <%= select_tag(:book_id, options_from_collection_for_select(Book.all.order(:title), :id, :title, @listing.book_id), :class => "form-control-sm")%>
+            <span title = "Show data for Book"><button class="btn btn-default btn-xs">
+                <i class="fa fa-search"></i>
+              </button></span>
+          </div>
+        </form>
+        <form action="/listings/new" class="form-inline">
+          <!-- Label and input for book_id -->
+          <div class="form-group">
+            <label for="isbn" class="control-label">
+              ISBN13 (Only numbers; no spaces or dashes)
+          </label>
+            <input type="text" id="isbn" name="isbn" placeholder="isbn" class="form-control-sm" value=<%= params[:isbn] %>>
+            <span title = "Show data for ISBN13"><button class="btn btn-default btn-xs">
+                <i class="fa fa-search"></i>
+              </button></span>
+          </div>
+        </form>
+        <p><label>Add New Book :</label> <span title = "Add new book"><a href="/books/new" class="btn btn-default btn-xs"><i class="fa fa-plus"></i>
+              <i class="fa fa-book"></i>
+            </a></span></p>
+      </div>
+    </div>
+  </div>
+  <!-- Show  manual options & book details only if book is filled -->
+  <% if @flag then %>
+    <div class = "row" >
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Manual Creation
+      </h3>
+        </div>
+        <div class="panel-body">
+          <form action="/create_listing" method="post">
+            <!-- Hidden input for authenticity token to protect from forgery -->
+            <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+            <!-- Hidden input for status_id -->
+            <input name="status_id" type="hidden" value="1">
+            <!-- Label and input for price -->
+            <div class="form-group">
+              <label for="price" class="control-label">
+                Price
+          </label>
+              <input type="text" id="price" name="price" placeholder="Price" class="form-control" value="<%= number_to_currency(@listing.price) %>">
+            </div>
+            <!-- Label and input for sale_rent -->
+            <div class="form-group">
+              <label for="sale_rent" class="control-label">
+                Type of Listing
+          </label>
+              <select name="sale_rent">
+                <option value="Sale">Sale</option>
+                <option value="Rent">Rent</option>
+              </select>
+            </div>
+            <!-- hidden input for user_id -->
+            <input name="user_id" type="hidden" value="<%= current_user.id %>">
+            <!-- Label and input for book_id -->
+            <input name="book_id" type="hidden" value="<%= @listing.book_id%>">
+            <button class="btn btn-success">
+              Create Listing
+        </button>
+            or
+        <a href="/listings/new">Cancel</a>
+          </form>
+        </div>
+      </div>
+    </div>
+    <% if @mylists.present? then %>
+      <div class="row">
+        <div class="panel panel-primary">
+          <div class="panel-heading">
+            <h3 class="panel-title">
+              My Listings
+      </h3>
+          </div>
+          <div class="panel-body">
+            <table class="table table-striped table-hover">
+              <tr>
+                <th>Price</th>
+                <th>Type</th>
+                <th>Accepted/Rented</th>
+                <th>Actions</th>
+              </tr>
+              <% @mylists.each do |listing| %>
+                <tr>
+                  <td><%= number_to_currency(listing.price) %></td>
+                  <td><%= listing.sale_rent %></td>
+                  <% if listing.interests.where({:status_id => [4,6] }).present? then %>
+                    <td><%= if listing.interests.where({:status_id => [4,6] }).count > 0 then "Yes" else "No" end%></td>
+                    <% else %>
+                      <td>No</td>
+                    <% end %>
+                    <td>
+                      <% if can_edit?(listing) then %>
+                        <span title="Edit"><a href="/listings/<%= listing.id %>/edit" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>
+                        </a></span>
+                      <a href="/delete_listing/<%= listing.id %>" class="btn btn-danger" rel="nofollow"><i class="fa fa-trash"></i>
+                      </a>
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </table>
+          </div>
+        </div>
+      </div>
+    <% end %>
+    <div class="row">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+          <h3 class="panel-title">
+            Book Details
+      </h3>
+        </div>
+        <div class="panel-body">
+          <div class="row">
+            <div class="col-md-offset-1 col-md-5">
+              <img src="<%= @listing.book.artwork %>"> <%= @listing.book.title %>
+            </div>
+            <div class="col-md-5">
+              <dl class="dl-horizontal">
+                <dt>Authors</dt>
+                <% @listing.book.authors.each do |author| %>
+                  <dd><%= author.author_name %></dd>
+                <% end %>
+                <dt>Subject</dt>
+                <dd><%= @listing.book.subject.subject_number %> - <%= @listing.book.subject.subject_name %></dd>
+                <dt>Publisher</dt>
+                <dd><%= @listing.book.publisher %></dd>
+                <dt>Year</dt>
+                <dd><%= @listing.book.year %></dd>
+                <dt>Isbn13</dt>
+                <dd><%= @listing.book.isbn13 %></dd>
+                <dt>Isbn10</dt>
+                <dd><%= @listing.book.isbn10 %></dd>
+              </dl>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-offset-1 col-md-5">
+              <p align = "center"><b>Similar Offers</b></p>
+              <table class="table table-striped table-hover">
+                <tr>
+                  <th>Seller</th>
+                  <th>Price</th>
+                  <th>Type</th>
+                  <th>Actions</th>
+                </tr>
+                <% @listing.book.listings.where.not({:status_id => 2}).where.not({:user_id => current_user.id}).order("sale_rent ASC, price DESC").each do |listing| %>
+                  <tr>
+                    <td><%= listing.user.username.capitalize %></td>
+                    <td><%= number_to_currency(listing.price) %></td>
+                    <td><%= listing.sale_rent %></td>
+                    <td>
+                      <span title="Copy type and undercut">
+                        <form action="/create_listing" method="post">
+                          <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+                          <input name="status_id" type="hidden" value="1">
+                          <input name="price"     type="hidden" value="<%= [listing.price - 1,0].max %>">
+                          <input name="sale_rent" type="hidden" value="<%= listing.sale_rent %>">
+                          <input name="user_id" type="hidden" value="<%= current_user.id %>">
+                          <input name="book_id" type="hidden" value="<%= listing.book_id%>">
+                          <button class="btn btn-warning btn-xs">
+                            <i class="fa fa-clipboard"></i>
+                            <i class="fa fa-scissors"></i>
+                          </button>
+                        </form>
+                      </span>
+                    </td>
+                  </tr>
+                <% end %>
+              </table>
+            </div>
+            <div class="col-md-5">
+              <p align = "center"><b>Wishlists</b></p>
+              <table class="table table-striped table-hover">
+                <tr>
+                  <th>Buyer</th>
+                  <th>Price</th>
+                  <th>Type</th>
+                  <th>Actions</th>
+                </tr>
+                <% @listing.book.wishlists.where.not({:status_id => 2}).where.not({:user_id => current_user.id}).order("sale_rent ASC, price DESC").each do |wishlist| %>
+                  <tr>
+                    <td><%= wishlist.user.username.capitalize %></td>
+                    <td><%= wishlist.price %></td>
+                    <td><%= wishlist.sale_rent %></td>
+                    <td>
+                      <span title="Fulfil Wishlist">
+                        <form action="/create_listing" method="post">
+                          <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+                          <input name="status_id" type="hidden" value="1">
+                          <input name="price"     type="hidden" value="<%= [wishlist.price,0].max %>">
+                          <input name="sale_rent" type="hidden" value="<%= wishlist.sale_rent %>">
+                          <input name="user_id" type="hidden" value="<%= current_user.id %>">
+                          <input name="book_id" type="hidden" value="<%= wishlist.book_id%>">
+                          <button class="btn btn-warning btn-xs">
+                            <i class="fa fa-gift"></i>
+                          </button>
+                          <!-- hidden argument to indicate wishlist fulfilment -->
+                          <input name="wishlist_id" type="hidden" value="<%= wishlist.id%>">
+                        </form>
+                      </span>
+                    </td>
+                  </tr>
+                <% end %>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

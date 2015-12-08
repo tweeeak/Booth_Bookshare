@@ -1,0 +1,39 @@
+<table class="table table-striped table-condensed table-hover">
+  <tr>
+    <th>Price</th>
+    <th>Price +/-</th>
+    <th>Buyer</th>
+    <th>Time in Market</th>
+    <th>Actions</th>
+  </tr>
+  <!-- Trying to find all similar wishlists -->
+  <%# listings = wishlist.listings.where({:id => @nonavailable_listings, :book_id => wishlist.book_id}) %>
+  <% listings = Wishlist.where({:status_id => 1, :book_id => wishlist.book_id, :sale_rent => wishlist.sale_rent}).where('user_id != ?', current_user.id) %>
+  <% listings.each do |listing| %>
+    <tr>
+      <td><%= number_to_currency(listing.price) %></td>
+      <td><font color=" <%= if wishlist.price - listing.price >= 0 then 'green' else 'red' end %>">
+          <%= number_to_currency(listing.price-wishlist.price) %></font>
+      </td>
+      <td><%= listing.user.username.capitalize %></td>
+      <td><%= time_ago_in_words(listing.updated_at)%> ago</td>
+      <td>
+        <% if listing.price > wishlist.price then %>
+          <span title="Undercut">
+            <form action="/update_wishlist/<%= wishlist.id %>" method="post">
+              <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+              <input name="status_id" type="hidden" value="<%= Status.find_by({ :status => "active" }).id %>">
+              <input name="price"     type="hidden" value="<%= [listing.price + 1,0].max %>">
+              <input name="sale_rent" type="hidden" value="<%= wishlist.sale_rent %>">
+              <input name="user_id" type="hidden" value="<%= current_user.id %>">
+              <input name="book_id" type="hidden" value="<%= wishlist.book_id%>">
+              <button class="btn btn-warning btn-xs">
+                <i class="fa fa-scissors"></i>
+              </button>
+            </form>
+          </span>
+          <% end %>
+      </td>
+    </tr>
+  <% end %>
+</table>

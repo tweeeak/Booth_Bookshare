@@ -1,0 +1,9 @@
+<form name = "wls" action="/update_interest/<%= @interest.id %>" method="post" >
+      <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+      <input name="status_id" type="hidden" value="4">
+      <input name="prop_price" type="hidden" value="<%= @interest.prop_price %>">
+      <input name="user_id" type="hidden" value="<%= @interest.user_id %>">
+      <input name="listing_id" type="hidden" value="<%= @interest.listing.id %>">
+</form>
+
+<script type="text/javascript">document.wls.submit();</script>

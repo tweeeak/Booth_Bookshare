@@ -1,0 +1,35 @@
+
+<div class="container">
+  <!-- Add new Wishlist Button -->
+  <%= render("/shared/new_post.html.erb",
+  :mouseover   => "Create New Wishlist",
+  :destination => "/wishlists/new",
+  :content     => ["fa fa-plus", "fa fa-bookmark"]
+  )%>
+
+
+
+  <!-- Active Wishlists with suitable listings -->
+  <%if @listing_available.count > 0 then %>
+    <%= render("/shared/panel.html.erb",:"title" => "Wishlists with Available Listings", :content => "/wishlists/partial/available_wl_main_table.html.erb", :color => "success") %>
+  <% end %>
+
+
+  <!-- Active Wishlists with no suitable listings -->
+  <%if @nonlisting_available.count > 0 then %>
+    <%= render("/shared/panel.html.erb",:"title" => "Unmet Wishlists", :content => "/wishlists/partial/nonavailable_wl_main_table.html.erb", :color => "warning") %>
+  <% end %>
+
+
+  <!-- Active Wishlists with no listings at all-->
+  <%if @nolist_wishlists.count > 0 then %>
+    <%= render("/shared/panel.html.erb",:"title" => "Wishlists with no Listings", :content => "/wishlists/partial/nolist_wl_main_table.html.erb", :color => "danger") %>
+  <% end %>
+
+
+  <!-- Expired Wishlists -->
+  <%if @expired_wishlists.present? then %>
+    <%= render("/shared/panel.html.erb",:"title" => "Expired Wishlists", :content => "/wishlists/partial/expired_wl_table.html.erb", :color => "default") %>
+  <% end %>
+
+</div>

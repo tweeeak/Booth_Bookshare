@@ -1,0 +1,52 @@
+<!-- Validation failure messages -->
+<% if @interest.errors.any? %>
+  <% @interest.errors.full_messages.each do |message| %>
+    <div class="alert alert-dismissable alert-danger">
+      <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+      <%= message %>
+    </div>
+  <% end %>
+<% end %>
+
+<div class="container">
+<div class="row">
+<div class="panel panel-primary">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+      How Much would you like to pay?
+    </h3>
+  </div>
+  <div class="panel-body">
+      <form action="/create_interest" method="post" class="form-inline">
+      <!-- Hidden input for authenticity token to protect from forgery -->
+      <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+
+      <!-- status_id -->
+      <input name="status_id" type="hidden" value="3">
+
+
+      <!-- Label and input for prop_price -->
+      <div class="form-group">
+        <label for="prop_price" class="control-label">
+          Bid price:
+        </label>
+
+        <input type="text" id="prop_price" name="prop_price" placeholder="Prop price" class="form-control-xs" value="<%= number_to_currency(@listing.price) %>">
+      </div>
+
+      <!-- user_id -->
+      <input name="user_id" type="hidden" value="<%= current_user.id %>">
+
+      <!-- Label and input for listing_id -->
+      <input name="listing_id" type="hidden" value="<%= @listing.id %>">
+
+      <button class="btn btn-success btn-xs">
+        Bid!
+      </button>
+      or
+      <a href="/myinterests">Cancel</a>
+    </form>
+  </div>
+</div>
+</div>
+</div>

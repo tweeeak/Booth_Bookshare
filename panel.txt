@@ -1,0 +1,51 @@
+<div class="container">
+<div class="row">
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">
+    </h3>
+  </div>
+
+  <div class="panel-body">
+  </div>
+</div>
+</div>
+</div>
+
+<%#= list.interests.map { |e| e.status.status}.include? "submitted" %>
+
+update interests set status_id = 3 where id = 3;
+
+
+on controller before_action :user_must_be_admin, :only => [:index, :new, etc etc]
+create method
+def user_must_be_admin
+  if condition then
+    redirect_to blablabla
+  end
+end
+
+or gem activeadmin
+use gem mailgun for emails
+gem figaro for password/credentials stuff so it doesnt get uploaded to github
+add the page to .gitignore
+ENV["varname here"] is how you call the hash.
+
+jquery succinctly
+
+select interests.id, interests.status_id, books.id, listings.status_id
+from interests, listings, books
+where interests.listing_id = listings.id
+and     listings.book_id = books.id
+order by interests.updated_at desc
+limit 2
+
+select * from interests, listings
+where interests.listing_id = listings.id
+and listings.book_id = 38
+
+ERASE LISTING INTERESTS, reactivate WL
+
+delete from interests where listing_id  = 36
+delete from listings where id = 36
+update wishlists set status_id = 1 where book_id = 39

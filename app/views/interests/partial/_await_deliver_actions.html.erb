@@ -1,0 +1,20 @@
+<style>
+  form {display: inline-block;}
+</style>
+<!-- Change status from accepted to rented -->
+<% if interest.user_id == current_user.id && interest.status_id == "4" then %>
+  <span title="Book Received">
+    <form action="/update_interest/<%= interest.id %>" method="post" class ="form-inline">
+      <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+      <input name="status_id" type="hidden"    value="<%= 6 %>">
+      <input name="prop_price" type="hidden"    value="<%= interest.prop_price %>">
+      <input name="user_id" type="hidden"       value="<%= interest.user_id %>">
+      <input name="listing_id" type="hidden"    value="<%= interest.listing_id %>">
+      <button class="btn btn-xs btn-success">
+        <i class="fa fa-book"></i>
+      </button>
+    </form>
+  </span>
+  <!-- Contact Option -->
+  <span title="Contact"><a href="/interests/contact/<%= interest.id %>" class="btn btn-primary btn-xs"><i class="fa fa-envelope-o"></i></a></span>
+<% end %>

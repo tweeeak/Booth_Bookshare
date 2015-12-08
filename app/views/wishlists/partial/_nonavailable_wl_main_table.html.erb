@@ -1,0 +1,43 @@
+<% cnt = 0 %>
+<table class="table table-condensed " style="border-collapse:collapse;">
+  <thead>
+    <tr>
+      <th>&nbsp;</th>
+      <th>Artwork</th>
+      <th>Book</th>
+      <th>Subject</th>
+      <th>Year</th>
+      <th>Type</th>
+      <th>Target Price</th>
+      <th>Actions</th>
+      <!--# of bids, max min? price diff or best? idk...-->
+    </tr>
+  </thead>
+  <tbody>
+    <% @nonlisting_available.uniq.each do |wishlist|%>
+    <!-- No need for collapsing and complex tables here. Only 1 per book -->
+    <tr data-toggle="collapse" data-target="#nawl<%= cnt %>" class="accordion-toggle">
+      <td><button class="btn btn-default btn-xs"><span class="fa fa-th-list"></span></button></td>
+      <td><img src="<%= wishlist.book.artwork %>" height=50%></td>
+      <td><%= wishlist.book.title %></td>
+      <td><%= wishlist.book.subject.subject_number %> - <%= wishlist.book.subject.subject_name %></td>
+      <td><%= wishlist.book.year %></td>
+      <td><%= wishlist.sale_rent %></td>
+      <td><%= number_to_currency(wishlist.price) %></td>
+      <td>
+        <%= render("/wishlists/partial/action_edit_del_wl.html.erb", :wishlist=> wishlist) %>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="12" class="hiddenRow">
+        <div class="accordian-body collapse" id="nawl<%= cnt %>">
+          <!-- Here is where I have to render the accordeon. -->
+          <%= render("/shared/double_table.html.erb", :wishlist => wishlist, :title1 => "Listings", :title2 => "Similar Wishlists", :content1 => "/wishlists/partial/nonavailable_wl_sub_table.html.erb", :content2 => "/wishlists/partial/nonavailable_wl_sub_table2.html.erb") %>
+          <%#= render("/wishlists/partial/nonavailable_wl_sub_table.html.erb", :wishlist => wishlist)%>
+        </div>
+      </td>
+    </tr>
+    <% cnt += 1 %>
+    <% end %>
+  </tbody>
+</table>

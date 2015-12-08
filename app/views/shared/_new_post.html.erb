@@ -1,0 +1,17 @@
+<!-- ###################################
+# INPUTS:                              #
+#   mouseover   => value for span      #
+#   destination => href for a          #
+#   content     => fontawesome array   #
+#####################################-->
+
+<div class = "row">
+    <span title= "<%= mouseover %>" >
+      <p><a href= "<%= destination %>" class="btn btn-default btn-block btn-xs">
+        <% content.each do |cnt| %>
+        <i class="<%= cnt %>"></i>
+        <% end %>
+      </a>
+    </p>
+  </span>
+</div>

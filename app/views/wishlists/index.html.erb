@@ -1,0 +1,36 @@
+<div class="page-header">
+  <h1>
+    Wishlists
+    <a href="/wishlists/new" class="btn btn-lg btn-success">New Wishlist</a>
+  </h1>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-striped table-hover">
+      <tr>
+        <th>Status</th>
+        <th>Price</th>
+        <th>Type</th>
+        <th>Seller</th>
+        <th>Book</th>
+        <th>Actions</th>
+      </tr>
+
+      <% @wishlists.each do |wishlist| %>
+      <tr>
+        <td><%= wishlist.status.status %></td>
+        <td><%= number_to_currency(wishlist.price) %></td>
+        <td><%= wishlist.sale_rent %></td>
+        <td><%= wishlist.user.username.capitalize %></td>
+        <td><%= wishlist.book.title %></td>
+        <td>
+          <a href="/wishlists/<%= wishlist.id %>" class="btn btn-primary">Show</a>
+          <a href="/wishlists/<%= wishlist.id %>/edit" class="btn btn-warning">Edit</a>
+          <a href="/delete_wishlist/<%= wishlist.id %>" class="btn btn-danger" rel="nofollow">Delete</a>
+        </td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<!-- Change status from 9,10 to 11 -->
+<% if interest.user_id == current_user.id && (interest.status_id = "9" || interest.status_id = "10") then %>
+  <span title="Dismiss Alert">
+    <form action="/update_interest/<%= interest.id %>" method="post" class ="form-inline">
+      <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
+      <input name="status_id" type="hidden"    value="<%= 11 %>">
+      <input name="prop_price" type="hidden"    value="<%= interest.prop_price %>">
+      <input name="user_id" type="hidden"       value="<%= interest.user_id %>">
+      <input name="listing_id" type="hidden"    value="<%= interest.listing_id %>">
+      <button class="btn btn-xs btn-warning">
+        <i class="fa fa-eye-slash"></i>
+      </button>
+    </form>
+  </span>
+<% end %>

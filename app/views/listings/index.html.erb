@@ -1,0 +1,51 @@
+<div class="page-header">
+  <h1>
+    Active Listings
+    <a href="/listings/new" class="btn btn-lg btn-success">New Listing</a>
+  </h1>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <table class="table table-striped table-hover">
+      <tr>
+        <th>Status</th>
+        <th>Price</th>
+        <th>Type</th>
+        <th>Seller</th>
+        <th>Book</th>
+        <th>Actions</th>
+      </tr>
+      <% @listings.each do |listing| %>
+      <tr>
+        <td><%= listing.status.status %></td>
+        <td><%= number_to_currency(listing.price) %></td>
+        <td><%= listing.sale_rent %></td>
+        <td><%= listing.user.username.capitalize %></td>
+        <td><span title="book details"><a href="/books/<%= listing.book.id %>" class="btn btn-default btn-xs"><i class="fa fa-eye"></i>
+          </a></span> <%= listing.book.title %> </td>
+        <td>
+          <% if can_bid?(listing) %>
+          <span title="Bid"><a href="/interests/new/<%= listing.id %>" class="btn btn-success"><i class="fa fa-shopping-cart"></i>
+          </a></span>
+          <% end %>
+
+          <% if can_rebid?(listing) %>
+          <span title="Re-bid"><a href="/interests/<%= listing.interests.find_by({:user_id => current_user.id}).id %>/edit" class="btn btn-warning"><i class="fa fa-cart-plus"></i>
+          </a></span>
+          <% end %>
+
+
+
+          <% if can_edit?(listing) then %>
+          <span title="Edit"><a href="/listings/<%= listing.id %>/edit" class="btn btn-warning"><i class="fa fa-pencil-square-o"></i>
+          </a></span>
+          <a href="/delete_listing/<%= listing.id %>" class="btn btn-danger" rel="nofollow"><i class="fa fa-trash"></i>
+          </a>
+          <% end %>
+        </td>
+      </tr>
+      <% end %>
+    </table>
+  </div>
+</div>
