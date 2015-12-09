@@ -152,7 +152,15 @@ class InterestsController < ApplicationController
         interest.status_id = 10.to_s
         if not(interest.save) then rt -= 100 end
       end
+      #Set other lists for book for the user to inactive
     end
+    bk.listings.where({:status_id => 1.to_s, :user_id => current_user.id.to_s}).where.not({:id => listid}).each do |blist|
+      blist.status_id = 2
+      blist.save
+    end
+
+
+
     # Set all other interests for the list to expired
     lt = Listing.find(listid)
     lt.interests.where.not({:user_id => userid}).each do |interest|
