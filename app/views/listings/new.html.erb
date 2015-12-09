@@ -186,7 +186,7 @@
                         <form action="/create_listing" method="post">
                           <input name="authenticity_token" type="hidden" value="<%= form_authenticity_token %>">
                           <input name="status_id" type="hidden" value="1">
-                          <input name="price"     type="hidden" value="<%= [listing.price - 1,0].max %>">
+                          <input name="price"     type="hidden" value="<%= number_to_currency([listing.price - 1,0].max) %>">
                           <input name="sale_rent" type="hidden" value="<%= listing.sale_rent %>">
                           <input name="user_id" type="hidden" value="<%= current_user.id %>">
                           <input name="book_id" type="hidden" value="<%= listing.book_id%>">

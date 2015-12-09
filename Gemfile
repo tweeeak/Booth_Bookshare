@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'devise'
+gem 'seed_dump' #Used to extract data from tables.
 #gem 'starter_generators', :git => "http://github.com/rbetina/starter_generators.git"
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.4'

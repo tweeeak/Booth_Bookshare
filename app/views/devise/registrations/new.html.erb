@@ -1,28 +1,50 @@
-<h2>Sign up</h2>
-<%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
-  <%= devise_error_messages! %>
-  <div class="field">
-    <%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true %>
-  </div>
-  <div class="field">
-    <%= f.label :username %><br />
-    <%= f.text_field :username %>
-  </div>
-  <div class="field">
-    <%= f.label :password %>
-    <% if @minimum_password_length %>
-      <em>(<%= @minimum_password_length %> characters minimum)</em>
-    <% end %><br />
-    <%= f.password_field :password, autocomplete: "off" %>
-  </div>
-  <div class="field">
-    <%= f.label :password_confirmation %><br />
-    <%= f.password_field :password_confirmation, autocomplete: "off" %>
-  </div>
-  <div class="actions">
-    <%= f.submit "Sign up" %>
-  </div>
-<% end %>
-<%= render "devise/shared/links" %>
+<div class="container">
+  <div class="row">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">
+          Sign Up
+        </h3>
+      </div>
+      <div class="panel-body">
+        <div class="col-md-offset-1 col-md-5">
+          <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+            <%= devise_error_messages! %>
+            <div class="field">
+              <%= f.label :email %><br />
+              <%= f.email_field :email, autofocus: true %>
+            </div>
+            <div class="field">
+              <%= f.label :username %><br />
+              <%= f.text_field :username %>
+            </div>
+            <div class="field">
+              <%= f.label :password %>
+              <% if @minimum_password_length %>
+                <em>(<%= @minimum_password_length %> characters minimum)</em>
+              <% end %><br />
+              <%= f.password_field :password, autocomplete: "off" %>
+            </div>
+            <div class="field">
+              <%= f.label :password_confirmation %><br />
+              <%= f.password_field :password_confirmation, autocomplete: "off" %>
+            </div>
+            <div class="actions">
+              <%= f.submit "Sign up" %>
+            </div>
+          <% end %>
+          <%= render "devise/shared/links" %>
+        </div>
+        <div class="col-md-5">
+          <h4><i>"Booth Bookshare is the simplest way to rent, borrow, sell and buy books used for Booth classes." - Antonio Herbst '16</i></h4>
 
+          <p><i class="fa fa-th-list"></i> <b>Listings</b> - This is what you do when you want to sell or rent a book.</p>
+
+          <p><i class="fa fa-gavel"></i> <b>Bids</b> - This is what you do when you want to buy or borrow a book. Simply find the book you want and take a look at the available offerings.</p>
+
+          <p><i class="fa fa-bookmark"></i> <b>Wishlists</b> - Did not find what you wanted? Add a book and create a wishlist for it. Did not find the right price? Create a wishlist!</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,1 +1,10 @@
+What I used:
 http://stackoverflow.com/questions/5720484/how-to-solve-certificate-verify-failed-on-windows
+
+
+
+I did not use the stuff below, but could be useful:
+In your Rails app, create a file in the config folder called disable_ssl.rb. In that new file, add this code:
+
+require 'openssl'
+OpenSSL::SSL::VERIFY_PEER = OpenSSL::SSL::VERIFY_NONE
