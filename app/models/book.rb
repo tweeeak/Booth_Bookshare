@@ -1,7 +1,6 @@
 class Book < ActiveRecord::Base
 
   validates :isbn13, :presence => true, :uniqueness => true
-  #Check what happens when there is none.
   validates :isbn10, :uniqueness => true
   validates :subject_id, :presence => true
   validates :title, :presence => true
